@@ -19,6 +19,15 @@ Development utilities:
   * ☕️ Simple, flexible, fun JavaScript test framework for Node.js & The Browser ☕️
 * [supertest](https://www.npmjs.com/package/supertest)
   * HTTP assertions made easy via superagent.
+  
+  
+## Description
+
+Node.js + Express + MongoDB build CRUD api
+
+## Proccess
+
+* 新增基础查询所有/新增/修改/根据ID查询/删除接口样本
 
 ## Setup
 
