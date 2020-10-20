@@ -5,15 +5,16 @@ const { json } = require('express');
 
 
 const db = monk('localhost:27017')
-const mongoCollection = db.get('userCollection');
+const mongoCollection = db.get('billCollection');
 
 const schema = Joi.object({
-    userId: Joi.string().trim().required(),
-    password: Joi.string().trim().required(),
-    phoneNo: Joi.number().required(),
-    email: Joi.string().required(),
-    createDate: Joi.date().iso(),
-    createBy: Joi.string(),
+    payMethods: Joi.string().trim().required(),
+    productDesc: Joi.string().trim().required(),
+    orderNum: Joi.number().required(),
+    remark: Joi.string().trim(),
+    billCategry: Joi.string().trim().required(),
+    createBy: Joi.string().required(),
+    createDate: Joi.date().iso().required(),
     updateDate: Joi.date().iso(),
     updateBy: Joi.string()
 });
@@ -42,13 +43,26 @@ router.get('/', async (req, res, next) => {
     }
 })
 
-// get one
-router.get('/:userId', async (req, res, next) => {
+// get today Data
+router.get('/today', async (req, res, next) => {
     try {
-        const { userId } = req.params;
-        console.log(userId, 'noted:::');
+        const items = await mongoCollection.find(
+            {
+                createDate:  {$gt: new Date('2020-10-18'), $lt: new Date('2020-10-19')}
+        });
+        res.json(items) 
+    } catch (error) {
+        next(error)
+    }
+})
+
+
+// get one
+router.get('/:id', async (req, res, next) => {
+    try {
+        const { id } = req.params;
         const item = await mongoCollection.findOne({
-            userId: userId,
+            _id: id,
         });
         console.log(item, 'noted:::::::');
         if (!item) return next({});
@@ -61,12 +75,9 @@ router.get('/:userId', async (req, res, next) => {
 // create one
 router.post('/', async (req, res, next) => {
     try {
-        // console.log(req, 'noted::::::');
         console.log(req.body, 'noted::::::');
         const value = await schema.validateAsync(req.body);
-        // console.log(mongoCollection.userCollection, 'noted::::::');
         const inserted = await mongoCollection.insert(value);
-        // console.log(res, 'abc');
         res.json(inserted);
     } catch (error) {
         next(error)
@@ -99,7 +110,7 @@ router.delete('/:id', async (req, res, next) => {
         const { id } = req.params;
         await mongoCollection.remove({_id: id });
         res.json({
-            message: 'Success'
+            message: 'delete Success'
         })
     } catch (error) {
         next(error)

@@ -4,7 +4,7 @@ const Joi = require('@hapi/joi');
 const { json } = require('express');
 
 
-const db = monk(process.env.MONGO_URI)
+const db = monk('localhost:27017')
 const faqs = db.get('faqs')
 
 const schema = Joi.object({
@@ -15,21 +15,31 @@ const schema = Joi.object({
 
 const router = express.Router();
 
-// get all
+/**
+ * get all
+ * http://localhost:5000/api/v1/faq?pageIndex=0&pageSize=10
+ * ?pageIndex=0&pageSize=10参数使用req.query获取参数
+ */
 router.get('/', async (req, res, next) => {
     try {
-        console.log(req, 'noted:::::::::::');
-        const items = await faqs.find({});
+        const {pageIndex, pageSize} = req.query;
+        console.log(pageIndex, pageSize, 'noted::::::::page');
+        const skipNum = Number(pageIndex * pageSize);
+        const items = await faqs.find({}, {
+            limit: Number(pageSize), // 限制一次查询条数
+            skip: Number(skipNum) // 跳过多少条数据开始查询
+        });
         res.json(items) 
     } catch (error) {
         next(error)
     }
-    res.json({
-        message: 'Hello Read all'
-    })
 })
 
 // get one
+/**
+ * http://localhost:5000/api/v1/faq/5f8d50e24ce0b939dcc629ec
+ * /:id 参数使用 req.params 获取
+ */
 router.get('/:id', async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -69,9 +79,7 @@ router.put('/:id', async (req, res, next) => {
         await faqs.update({
             _id: id,
         }, {
-            $set: {
-                value,
-            }
+            $set: value
         });
         res.json(value);
     } catch (error) {
