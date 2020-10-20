@@ -28,6 +28,10 @@ Node.js + Express + MongoDB build CRUD api
 ## Proccess
 
 * 新增基础查询所有/新增/修改/根据ID查询/删除接口样本
+* 新增userService 接口
+* 新增billService 接口
+* 更新查询接口为分页查询
+* 新增查询某一天数据接口
 
 ## Setup
 
