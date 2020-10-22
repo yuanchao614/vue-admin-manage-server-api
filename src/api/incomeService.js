@@ -7,19 +7,18 @@ const { json } = require('express');
 // const db = monk('localhost:27017')
 const db = monk(process.env.MONGO_URI)
 
-const mongoCollection = db.get('billCollection');
+const mongoCollection = db.get('incomeCollection');
 
 const schema = Joi.object({
-    payMethods: Joi.string().trim().required(),
+    incomePlatform: Joi.string().trim().required(), // 收入平台 支付宝/微信/现金/银行卡
     productDesc: Joi.string().trim().required(),
     orderNum: Joi.number().required(),
     remark: Joi.string().trim(),
-    billCategry: Joi.string().trim().required(),
+    incomeCategry: Joi.string().trim().required(),
     createBy: Joi.string().required(),
     createDate: Joi.date().iso().required(),
     updateDate: Joi.date().iso(),
-    updateBy: Joi.string(),
-    amount: Joi.number().required()
+    updateBy: Joi.string()
 });
 
 const isoDate = () => {
@@ -33,15 +32,14 @@ const router = express.Router();
 router.get('/', async (req, res, next) => {
     try {
         // console.log(req, 'noted:::::::::::');
-        const {pageIndex, pageSize, payMethods} = req.query;
+        const { pageIndex, pageSize } = req.query;
         console.log(pageIndex, pageSize, 'noted::::::::page');
         const skipNum = Number(pageIndex * pageSize);
-        const items = await mongoCollection.find({payMethods: payMethods}, {
+        const items = await mongoCollection.find({}, {
             limit: Number(pageSize), // 限制一次查询条数
             skip: Number(skipNum) // 跳过多少条数据开始查询
         });
-        const total = await mongoCollection.count({payMethods: payMethods});
-        res.json({body: items, total: total}) 
+        res.json(items)
     } catch (error) {
         next(error)
     }
@@ -52,9 +50,9 @@ router.get('/today', async (req, res, next) => {
     try {
         const items = await mongoCollection.find(
             {
-                createDate:  {$gt: new Date('2020-10-18'), $lt: new Date('2020-10-19')}
-        });
-        res.json(items) 
+                createDate: { $gt: new Date('2020-10-18'), $lt: new Date('2020-10-19') }
+            });
+        res.json(items)
     } catch (error) {
         next(error)
     }
@@ -112,7 +110,7 @@ router.put('/:id', async (req, res, next) => {
 router.delete('/:id', async (req, res, next) => {
     try {
         const { id } = req.params;
-        await mongoCollection.remove({_id: id });
+        await mongoCollection.remove({ _id: id });
         res.json({
             message: 'delete Success'
         })

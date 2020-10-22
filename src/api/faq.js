@@ -4,7 +4,8 @@ const Joi = require('@hapi/joi');
 const { json } = require('express');
 
 
-const db = monk('localhost:27017')
+// const db = monk('localhost:27017')
+const db = monk(process.env.MONGO_URI)
 const faqs = db.get('faqs')
 
 const schema = Joi.object({

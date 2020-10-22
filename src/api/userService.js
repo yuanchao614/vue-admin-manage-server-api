@@ -4,7 +4,7 @@ const Joi = require('@hapi/joi');
 const { json } = require('express');
 
 
-const db = monk('localhost:27017')
+const db = monk(process.env.MONGO_URI)
 const mongoCollection = db.get('userCollection');
 
 const schema = Joi.object({
@@ -36,7 +36,8 @@ router.get('/', async (req, res, next) => {
             limit: Number(pageSize), // 限制一次查询条数
             skip: Number(skipNum) // 跳过多少条数据开始查询
         });
-        res.json(items) 
+        const total = await mongoCollection.count();
+        res.json({body: items, total: total}) 
     } catch (error) {
         next(error)
     }
