@@ -60,6 +60,36 @@ router.get('/today', async (req, res, next) => {
     }
 })
 
+// query by moth
+router.post('/queryByMonth', async (req, res, next) => {
+    try {
+        console.log(req.body, 'noted::::::');
+        const {startDay, endDay} = req.body;
+        const items = await mongoCollection.find(
+            {
+                createDate:  {$gte: new Date(startDay), $lte: new Date(endDay)}
+        });
+        const amountSum = await mongoCollection.aggregate([
+            { $match : { // 筛选条件
+                createDate:  {$gte: new Date(startDay), $lte: new Date(endDay)}
+              }},
+            { $group : { // 按字段求和
+            _id : null,
+            sum : { $sum : "$amount" }
+          }},
+          {$project: { // 哪些字段需要展示
+            "_id": 1,
+            "sum": 1
+          }}])
+          console.log(amountSum);
+        const total = await items.length;
+        console.log(total);
+        res.json({body: items, total: total, amountSum: amountSum});
+    } catch (error) {
+        next(error)
+    }
+})
+
 
 // get one
 router.get('/:id', async (req, res, next) => {

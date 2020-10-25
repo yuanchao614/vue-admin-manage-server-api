@@ -59,6 +59,23 @@ router.get('/:userId', async (req, res, next) => {
     }
 })
 
+// query by moth
+router.post('/queryByMonth', async (req, res, next) => {
+    try {
+        console.log(req.body, 'noted::::::');
+        const {startDay, endDay} = req.body;
+        const items = await mongoCollection.find(
+            {
+                createDate:  {$gte: new Date(startDay), $lte: new Date(endDay)}
+        });
+        const total = await items.length;
+        console.log(total);
+        res.json({body: items, total: total});
+    } catch (error) {
+        next(error)
+    }
+})
+
 // create one
 router.post('/', async (req, res, next) => {
     try {
