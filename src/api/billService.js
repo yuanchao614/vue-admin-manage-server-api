@@ -48,11 +48,12 @@ router.get('/', async (req, res, next) => {
 })
 
 // get today Data
-router.get('/today', async (req, res, next) => {
+router.post('/today', async (req, res, next) => {
+    const { today, nextDay } = req.body;
     try {
         const items = await mongoCollection.find(
             {
-                createDate:  {$gt: new Date('2020-10-18'), $lt: new Date('2020-10-19')}
+                createDate:  {$gte: new Date(today), $lt: new Date(nextDay)}
         });
         res.json(items) 
     } catch (error) {
