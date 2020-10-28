@@ -12,6 +12,9 @@ const echartsService = require('./echartsService')
 
 const toDoService = require('./toDoService')
 
+const incomeService = require('./incomeService')
+
+
 
 const router = express.Router();
 
@@ -38,6 +41,8 @@ router.use('/billService', billService)
 router.use('/echartsService', echartsService)
 
 router.use('/toDoService', toDoService)
+router.use('/incomeService', incomeService)
+
 
 
 

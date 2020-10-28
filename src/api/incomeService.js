@@ -11,10 +11,10 @@ const mongoCollection = db.get('incomeCollection');
 
 const schema = Joi.object({
     incomePlatform: Joi.string().trim().required(), // 收入平台 支付宝/微信/现金/银行卡
-    productDesc: Joi.string().trim().required(),
     orderNum: Joi.number().required(),
     remark: Joi.string().trim(),
     incomeCategry: Joi.string().trim().required(),
+    incomeAmount: Joi.number().required(),
     createBy: Joi.string().required(),
     createDate: Joi.date().iso().required(),
     updateDate: Joi.date().iso(),
