@@ -18,6 +18,11 @@ const schema = Joi.object({
     updateBy: Joi.string()
 });
 
+const schemaLogin = Joi.object({
+    userId: Joi.string().trim().required(),
+    password: Joi.string().trim().required()
+});
+
 const isoDate = () => {
     const nowDate = new Date();
     return nowDate.setHours(nowDate.getHours(), nowDate.getMinutes() - nowDate.getTimezoneOffset());
@@ -86,6 +91,24 @@ router.post('/', async (req, res, next) => {
         const inserted = await mongoCollection.insert(value);
         // console.log(res, 'abc');
         res.json(inserted);
+    } catch (error) {
+        next(error)
+    }
+})
+
+
+router.post('/login', async (req, res, next) => {
+    try {
+        // console.log(req, 'noted::::::');
+        console.log(req.body, 'noted::::::');
+        const {userId, password} = await schemaLogin.validateAsync(req.body);
+        // console.log(mongoCollection.userCollection, 'noted::::::');
+        const result = await mongoCollection.findOne({
+            userId: userId,
+            password: password
+        });;
+        // console.log(res, 'abc');
+        res.json(result);
     } catch (error) {
         next(error)
     }

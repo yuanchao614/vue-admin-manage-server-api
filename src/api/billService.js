@@ -47,14 +47,14 @@ router.get('/', async (req, res, next) => {
     }
 })
 
-// get today Data
+// get latest 10 data
 router.post('/today', async (req, res, next) => {
     const { today, nextDay } = req.body;
     try {
         const items = await mongoCollection.find(
             {
-                createDate:  {$gte: new Date(today), $lt: new Date(nextDay)}
-        });
+                // createDate:  {$gte: new Date(today), $lt: new Date(nextDay)}
+        },  {sort: {createDate: -1},  limit: 10},);
         res.json(items) 
     } catch (error) {
         next(error)
