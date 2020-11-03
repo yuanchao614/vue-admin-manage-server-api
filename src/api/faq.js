@@ -1,7 +1,9 @@
 const express = require('express');
 const monk = require('monk');
 const Joi = require('@hapi/joi');
-const { json } = require('express');
+const {
+    json
+} = require('express');
 
 
 // const db = monk('localhost:27017')
@@ -23,14 +25,17 @@ const router = express.Router();
  */
 router.get('/', async (req, res, next) => {
     try {
-        const {pageIndex, pageSize} = req.query;
+        const {
+            pageIndex,
+            pageSize
+        } = req.query;
         console.log(pageIndex, pageSize, 'noted::::::::page');
         const skipNum = Number(pageIndex * pageSize);
         const items = await faqs.find({}, {
             limit: Number(pageSize), // 限制一次查询条数
             skip: Number(skipNum) // 跳过多少条数据开始查询
         });
-        res.json(items) 
+        res.json(items)
     } catch (error) {
         next(error)
     }
@@ -43,7 +48,9 @@ router.get('/', async (req, res, next) => {
  */
 router.get('/:id', async (req, res, next) => {
     try {
-        const { id } = req.params;
+        const {
+            id
+        } = req.params;
         const item = await faqs.findOne({
             _id: id,
         });
@@ -71,7 +78,9 @@ router.post('/', async (req, res, next) => {
 // update one
 router.put('/:id', async (req, res, next) => {
     try {
-        const { id } = req.params;
+        const {
+            id
+        } = req.params;
         const value = await schema.validateAsync(req.body);
         const item = await faqs.findOne({
             _id: id,
@@ -91,8 +100,12 @@ router.put('/:id', async (req, res, next) => {
 // delete one
 router.delete('/:id', async (req, res, next) => {
     try {
-        const { id } = req.params;
-        await faqs.remove({_id: id });
+        const {
+            id
+        } = req.params;
+        await faqs.remove({
+            _id: id
+        });
         res.json({
             message: 'Success'
         })

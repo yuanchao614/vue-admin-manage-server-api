@@ -1,7 +1,9 @@
 const express = require('express');
 const monk = require('monk');
 const Joi = require('@hapi/joi');
-const { json } = require('express');
+const {
+    json
+} = require('express');
 
 
 // const db = monk('localhost:27017')
@@ -33,15 +35,26 @@ const router = express.Router();
 router.get('/', async (req, res, next) => {
     try {
         // console.log(req, 'noted:::::::::::');
-        const {pageIndex, pageSize, payMethods} = req.query;
+        const {
+            pageIndex,
+            pageSize,
+            payMethods
+        } = req.query;
         console.log(pageIndex, pageSize, 'noted::::::::page');
         const skipNum = Number(pageIndex * pageSize);
-        const items = await mongoCollection.find({payMethods: payMethods}, {
+        const items = await mongoCollection.find({
+            payMethods: payMethods
+        }, {
             limit: Number(pageSize), // 限制一次查询条数
             skip: Number(skipNum) // 跳过多少条数据开始查询
         });
-        const total = await mongoCollection.count({payMethods: payMethods});
-        res.json({body: items, total: total}) 
+        const total = await mongoCollection.count({
+            payMethods: payMethods
+        });
+        res.json({
+            body: items,
+            total: total
+        })
     } catch (error) {
         next(error)
     }
@@ -49,13 +62,20 @@ router.get('/', async (req, res, next) => {
 
 // get latest 10 data
 router.post('/today', async (req, res, next) => {
-    const { today, nextDay } = req.body;
+    const {
+        today,
+        nextDay
+    } = req.body;
     try {
-        const items = await mongoCollection.find(
-            {
-                // createDate:  {$gte: new Date(today), $lt: new Date(nextDay)}
-        },  {sort: {createDate: -1},  limit: 10},);
-        res.json(items) 
+        const items = await mongoCollection.find({
+            // createDate:  {$gte: new Date(today), $lt: new Date(nextDay)}
+        }, {
+            sort: {
+                createDate: -1
+            },
+            limit: 10
+        }, );
+        res.json(items)
     } catch (error) {
         next(error)
     }
@@ -65,27 +85,47 @@ router.post('/today', async (req, res, next) => {
 router.post('/queryByMonth', async (req, res, next) => {
     try {
         console.log(req.body, 'noted::::::');
-        const {startDay, endDay} = req.body;
-        const items = await mongoCollection.find(
-            {
-                createDate:  {$gte: new Date(startDay), $lte: new Date(endDay)}
+        const {
+            startDay,
+            endDay
+        } = req.body;
+        const items = await mongoCollection.find({
+            createDate: {
+                $gte: new Date(startDay),
+                $lte: new Date(endDay)
+            }
         });
-        const amountSum = await mongoCollection.aggregate([
-            { $match : { // 筛选条件
-                createDate:  {$gte: new Date(startDay), $lte: new Date(endDay)}
-              }},
-            { $group : { // 按字段求和
-            _id : null,
-            sum : { $sum : "$amount" }
-          }},
-          {$project: { // 哪些字段需要展示
-            "_id": 1,
-            "sum": 1
-          }}])
-          console.log(amountSum);
+        const amountSum = await mongoCollection.aggregate([{
+                $match: { // 筛选条件
+                    createDate: {
+                        $gte: new Date(startDay),
+                        $lte: new Date(endDay)
+                    }
+                }
+            },
+            {
+                $group: { // 按字段求和
+                    _id: null,
+                    sum: {
+                        $sum: "$amount"
+                    }
+                }
+            },
+            {
+                $project: { // 哪些字段需要展示
+                    "_id": 1,
+                    "sum": 1
+                }
+            }
+        ])
+        console.log(amountSum);
         const total = await items.length;
         console.log(total);
-        res.json({body: items, total: total, amountSum: amountSum});
+        res.json({
+            body: items,
+            total: total,
+            amountSum: amountSum
+        });
     } catch (error) {
         next(error)
     }
@@ -95,7 +135,9 @@ router.post('/queryByMonth', async (req, res, next) => {
 // get one
 router.get('/:id', async (req, res, next) => {
     try {
-        const { id } = req.params;
+        const {
+            id
+        } = req.params;
         const item = await mongoCollection.findOne({
             _id: id,
         });
@@ -122,7 +164,9 @@ router.post('/', async (req, res, next) => {
 // update one
 router.put('/:id', async (req, res, next) => {
     try {
-        const { id } = req.params;
+        const {
+            id
+        } = req.params;
         const value = await schema.validateAsync(req.body);
         const item = await mongoCollection.findOne({
             _id: id,
@@ -142,8 +186,12 @@ router.put('/:id', async (req, res, next) => {
 // delete one
 router.delete('/:id', async (req, res, next) => {
     try {
-        const { id } = req.params;
-        await mongoCollection.remove({_id: id });
+        const {
+            id
+        } = req.params;
+        await mongoCollection.remove({
+            _id: id
+        });
         res.json({
             message: 'delete Success'
         })
